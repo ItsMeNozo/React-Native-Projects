@@ -1,20 +1,59 @@
+import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, ImageBackground, SafeAreaView } from 'react-native';
+
+import { Colors } from './constants/colors';
+import StartGameScreen from './screens/StartGameScreen';
+import { LinearGradient } from 'expo-linear-gradient';
+import GameScreen from './screens/GameScreen';
+import GameOverScreen from './screens/GameOverScreen';
+
 
 export default function App() {
+  // set initial state null = no number to later check this and switch to appropriate screen
+  const [userNumber, setUserNumber] = useState();
+  const [gameOver, setGameOver] = useState(false);
+
+
+  function pickedNumberHandler(pickedNumber) {
+    setUserNumber(pickedNumber);
+    setGameOver(false);
+  }
+
+  let screen = <StartGameScreen onPickedNumber={pickedNumberHandler} />;
+
+  if (userNumber) {
+    screen =
+      <GameScreen userNumber={userNumber}
+        onGameOver={() => setGameOver(true)} />;
+  }
+
+  if (gameOver)
+    screen = <GameOverScreen />
+
   return (
-    <View style={styles.container}>
-      <Text>Hello World!!!!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <LinearGradient style={styles.rootScreen}
+      colors={[Colors.primary700, Colors.accent500]}
+    >
+      <ImageBackground source={require('./assets/images/background.png')}
+        resizeMode="cover"
+        style={styles.rootScreen}
+        imageStyle={styles.backgroundImage}
+      >
+        {/* execute either GameScreen or StartGameScreen or GameOver*/}
+        <SafeAreaView style={styles.rootScreen}>
+          {screen}
+        </SafeAreaView>
+      </ImageBackground>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  rootScreen: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
+  backgroundImage: {
+    opacity: 0.15
+  }
 });
