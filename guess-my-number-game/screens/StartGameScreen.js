@@ -32,7 +32,6 @@ export default function StartGameScreen({ onPickedNumber }) {
 			)
 			return; // cancel execution
 		}
-
 		onPickedNumber(chosenNumber);
 	}
 	return <View style={styles.mainContainer}>

@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../../constants/colors';
+import { useFonts } from 'expo-font'
 
 export default function NumberContainer({ children }) {
     return <View style={styles.container}>
@@ -16,11 +17,12 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
-
+        marginBottom: 15
     },
     numberText: {
         color: Colors.accent600,
         fontSize: 36,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        fontFamily: 'open-sans'
     }
 });
