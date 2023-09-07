@@ -1,4 +1,7 @@
-import { View, Text, StyleSheet, Alert, FlatList } from "react-native";
+import {
+  View, Text, StyleSheet, Alert, FlatList,
+  useWindowDimensions
+} from "react-native";
 import Title from "../components/ui/Title";
 import { useState, useEffect, useMemo } from "react";
 
@@ -10,7 +13,6 @@ import { AntDesign } from '@expo/vector-icons';
 import GuessLogItem from "../components/game/GuessLogItem";
 
 function generateRandomBetween(min, max, exclude) {
-  // console.log(min, max);
   const rndNum = Math.floor(Math.random() * (max - min)) + min;
 
   // console.log(min, max, exclude, rndNum);
@@ -21,9 +23,11 @@ function generateRandomBetween(min, max, exclude) {
   return rndNum;
 }
 
+
 let minBoundary = 1, maxBoundary = 100; // it's actually 99 
 
 export default function GameScreen({ userNumber, onGameOver }) {
+  const { width, height } = useWindowDimensions();
   // exclude to add an extra difficulty: fail user first time
   const initialGuess = generateRandomBetween(1, 100, userNumber);
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
@@ -45,55 +49,79 @@ export default function GameScreen({ userNumber, onGameOver }) {
     minBoundary = 1; maxBoundary = 100;
   }, []);
 
-  return (
-    <View style={styles.screen}>
-      <Title>Opponent's Guess</Title>
-      <NumberContainer>{currentGuess}</NumberContainer>
-      <Card>
-        <InstructionText style={styles.instructionText}>Higher or lower?</InstructionText>
-        <View style={styles.buttonsContainer}>
-          <View style={styles.buttonContainer}>
-            <PrimaryButton onPress={() => {
-              if (currentGuess > userNumber) {
-                Alert.alert('Dont lie', "You know that it's wrong",
-                  [{ text: 'Sorry!', style: 'cancel' }]);
-              }
-              else {
-                minBoundary = currentGuess + 1;
-                const randNum = generateRandomBetween(minBoundary, maxBoundary, currentGuess)
-                setCurrentGuess(randNum);
+  function nextGuessHandler(action) {
 
-                // update guess logs
-                setGuessRounds(prevGuesses => [randNum, ...prevGuesses]);
-              }
-            }}>
+    if ((action === "plus" && currentGuess > userNumber) || (action === "minus" && currentGuess < userNumber)) {
+      Alert.alert('Dont lie', "You know that it's wrong",
+        [{ text: 'Sorry!', style: 'cancel' }]);
+      return;
+
+    }
+
+    if (action == "plus") {
+      minBoundary = currentGuess + 1;
+    }
+    else if (action === "minus") {
+      maxBoundary = currentGuess;
+    }
+
+    const randNum = generateRandomBetween(minBoundary, maxBoundary, currentGuess);
+    setCurrentGuess(randNum);
+
+    // update guess logs
+    setGuessRounds(prevGuesses => [randNum, ...prevGuesses]);
+
+  }
+
+  let content = <>
+    <NumberContainer>{currentGuess}</NumberContainer>
+    <Card>
+      <InstructionText style={styles.instructionText}>Higher or lower?</InstructionText>
+      <View style={styles.buttonsContainer}>
+        <View style={styles.buttonContainer}>
+          <PrimaryButton onPress={nextGuessHandler.bind(this, 'plus')}>
+            <AntDesign name="plus" size={24} color="white" />
+
+          </PrimaryButton>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <PrimaryButton onPress={nextGuessHandler.bind(this, 'minus')}>
+            <AntDesign name="minus" size={24} color="white" />
+          </PrimaryButton>
+        </View>
+
+      </View>
+    </Card>
+  </>
+  if (width > 500) {
+    // landscape mode
+    content = (
+      <>
+        <View style={styles.buttonsContainerWide}>
+          <View style={styles.buttonContainer}>
+            <PrimaryButton onPress={nextGuessHandler.bind(this, "plus")}>
               <AntDesign name="plus" size={24} color="white" />
 
             </PrimaryButton>
           </View>
 
+          <NumberContainer>{currentGuess}</NumberContainer>
           <View style={styles.buttonContainer}>
-            <PrimaryButton onPress={() => {
-              // maxBoundary = prevGuess;
-              if (currentGuess < userNumber) {
-                Alert.alert('Dont lie', "You know that it's wrong",
-                  [{ text: 'Sorry!', style: 'cancel' }]);
-              }
-              else {
-                maxBoundary = currentGuess;
-                const randNum = generateRandomBetween(minBoundary, maxBoundary, currentGuess)
-                setCurrentGuess(randNum);
-
-                // update guess logs
-                setGuessRounds(prevGuesses => [randNum, ...prevGuesses]);
-              }
-            }}>
+            <PrimaryButton onPress={nextGuessHandler.bind(this, "minus")}>
               <AntDesign name="minus" size={24} color="white" />
             </PrimaryButton>
           </View>
-
         </View>
-      </Card>
+
+      </>
+    )
+  }
+
+  return (
+    <View style={styles.screen}>
+      <Title>Opponent's Guess</Title>
+      {content}
       <View style={styles.flatlistContainer}>
         <FlatList
           data={guessRounds}
@@ -114,10 +142,11 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     padding: 24,
-    marginTop: 10
+    marginTop: 10,
+    alignItems: 'center'
   },
   instructionText: {
-    marginBottom: 12
+    marginBottom: 12,
   },
   title: {
     fontSize: 24,
@@ -137,5 +166,9 @@ const styles = StyleSheet.create({
   flatlistContainer: {
     flex: 1,
     padding: 16
+  },
+  buttonsContainerWide: {
+    flexDirection: 'row',
+    alignItems: 'center'
   }
 })

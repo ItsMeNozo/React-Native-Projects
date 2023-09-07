@@ -1,15 +1,19 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 
 import { Colors } from '../../constants/colors';
 
 export default function GuessLogItem({ roundNumber, guess }) {
+	const { width, height } = useWindowDimensions();
+	const marginVerticalSize = width > 500 ? 5 : 8;
+
 	return (
-		<View style={styles.listItem}>
+		<View style={[styles.listItem, { marginVertical: marginVerticalSize }]}>
 			<Text style={styles.itemText}>#{roundNumber}</Text>
 			<Text style={styles.itemText}>Computer's Guess: {guess}</Text>
 		</View>
 	)
 }
+
 
 const styles = StyleSheet.create({
 	listItem: {
@@ -17,7 +21,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderRadius: 40,
 		padding: 12,
-		marginVertical: 8,
+		// marginVertical: marginVerticalSize,
 		backgroundColor: Colors.accent500,
 		flexDirection: 'row',
 		justifyContent: 'space-between',

@@ -10,7 +10,6 @@ import GameOverScreen from './screens/GameOverScreen';
 import * as SplashScreen from 'expo-splash-screen';  // waiting screen 
 import { useFonts } from 'expo-font';
 
-
 SplashScreen.preventAutoHideAsync();
 
 let guessRounds = 0;
@@ -78,21 +77,24 @@ export default function App() {
     return null;
   }
   return (
-    <LinearGradient style={styles.rootScreen}
-      colors={[Colors.primary700, Colors.accent500]}
-      onLayout={onLayoutRootView}
-    >
-      <ImageBackground source={require('./assets/images/background.png')}
-        resizeMode="cover"
-        style={styles.rootScreen}
-        imageStyle={styles.backgroundImage}
+    <>
+      <StatusBar style='light' />
+      <LinearGradient style={styles.rootScreen}
+        colors={[Colors.primary700, Colors.accent500]}
+        onLayout={onLayoutRootView}
       >
-        {/* execute either GameScreen or StartGameScreen or GameOver*/}
-        <SafeAreaView style={styles.rootScreen}>
-          {screen}
-        </SafeAreaView>
-      </ImageBackground>
-    </LinearGradient>
+        <ImageBackground source={require('./assets/images/background.png')}
+          resizeMode="cover"
+          style={styles.rootScreen}
+          imageStyle={styles.backgroundImage}
+        >
+          {/* execute either GameScreen or StartGameScreen or GameOver*/}
+          <SafeAreaView style={styles.rootScreen}>
+            {screen}
+          </SafeAreaView>
+        </ImageBackground>
+      </LinearGradient>
+    </>
   );
 }
 
